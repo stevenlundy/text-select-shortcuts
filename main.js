@@ -22,27 +22,28 @@ $(document).on('ready', function() {
 
 var duplicateLine = function(el) {
   var lines = el.value.split(String.fromCharCode(10));
-  var charNumber = 0;
-  for(var i = 0; i < lines.length; i++) {
-    charNumber += lines[i].length + 1;
-    if (charNumber > el.selectionStart) {
-      var start = el.selectionStart;
-      lines.splice(i, 0, lines[i]);
-      el.value = lines.join(String.fromCharCode(10));
-      el.selectionStart = start + lines[i].length + 1;
-      el.selectionEnd = start + lines[i].length + 1;
-      return lines[i];
-    }
-  }
+  var start = el.selectionStart;
+  var lineNumber = getLineNumber(el);
+  lines.splice(lineNumber, 0, lines[lineNumber]);
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start + lines[lineNumber].length + 1;
+  el.selectionEnd = start + lines[lineNumber].length + 1;
+  return el.value;
 };
 
 var getLine = function(el) {
+  var lines = el.value.split(String.fromCharCode(10));
+  var lineNumber = getLineNumber(el);
+  return line[lineNumber];
+};
+
+var getLineNumber = function(el) {
   var lines = el.value.split(String.fromCharCode(10));
   var charNumber = 0;
   for(var i = 0; i < lines.length; i++) {
     charNumber += lines[i].length + 1;
     if (charNumber > el.selectionStart) {
-      return lines[i];
+      return i;
     }
   }
 };
