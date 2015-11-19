@@ -5,15 +5,21 @@ $(document).on('ready', function() {
     registerKeyPress(e, this);
   };
   registerKeyPress = function(e, el) {
-    if(map[16] && map[17] && map[68]) { //ctrl+shift+D
+    var cmd = map[91]|| map[93] || map[224];
+    var ctrl = map[17];
+    var shift = map[16];
+    var up = map[38];
+    var down = map[40];
+    var D = map[68];
+    if((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
     }
-    if(map[16] && map[17] && map[38]) { //ctrl+shift+up
+    if((ctrl || cmd) && shift && up) {
       e.preventDefault();
       shiftLinesUp(el);
     }
-    if(map[16] && map[17] && map[40]) { //ctrl+shift+down
+    if((ctrl || cmd) && shift && down) {
       e.preventDefault();
       shiftLinesDown(el);
     }
