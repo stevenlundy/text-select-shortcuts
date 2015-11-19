@@ -15,7 +15,7 @@ $(document).on('ready', function() {
     }
     if(map[16] && map[17] && map[40]) { //ctrl+shift+down
       e.preventDefault();
-      shiftLinesUp(el);
+      shiftLinesDown(el);
     }
   };
   $('textarea').on('keydown', setState);
@@ -26,7 +26,7 @@ $(document).on('ready', function() {
     console.log('line');
     console.log(getLine(this));
   });
-})
+});
 
 var shiftLinesUp = function(el) {
   var startLine = getLineNumberAtIndex(el, el.selectionStart);
@@ -43,6 +43,24 @@ var shiftLinesUp = function(el) {
   el.value = lines.join(String.fromCharCode(10));
   el.selectionStart = start - (removed[0].length + 1);
   el.selectionEnd = end - (removed[0].length + 1);
+  return el.value;
+};
+
+var shiftLinesDown = function(el) {
+  var startLine = getLineNumberAtIndex(el, el.selectionStart);
+  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
+  var start = el.selectionStart;
+  var end = el.selectionEnd;
+
+  var lines = el.value.split(String.fromCharCode(10));
+  if(endLine >= lines.length - 1) {
+    return;
+  }
+  var removed = lines.splice(endLine + 1, 1);
+  lines.splice(startLine, 0, removed[0]);
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start + (removed[0].length + 1);
+  el.selectionEnd = end + (removed[0].length + 1);
   return el.value;
 };
 
