@@ -7,7 +7,7 @@ $(document).on('ready', function() {
   registerKeyPress = function(e, el) {
     if(map[16] && map[17] && map[68]) { //ctrl+shift+D
       e.preventDefault();
-      duplicateLine(el);
+      duplicate(el);
     }
     if(map[16] && map[17] && map[38]) { //ctrl+shift+up
       e.preventDefault();
@@ -64,6 +64,14 @@ var shiftLinesDown = function(el) {
   return el.value;
 };
 
+var duplicate = function(el) {
+  if(el.selectionStart === el.selectionEnd) {
+    duplicateLine(el);
+  } else {
+    duplicateSelection(el);
+  }
+};
+
 var duplicateLine = function(el) {
   var lines = el.value.split(String.fromCharCode(10));
   var start = el.selectionStart;
@@ -72,6 +80,18 @@ var duplicateLine = function(el) {
   el.value = lines.join(String.fromCharCode(10));
   el.selectionStart = start + lines[lineNumber].length + 1;
   el.selectionEnd = start + lines[lineNumber].length + 1;
+  return el.value;
+};
+
+var duplicateSelection = function(el) {
+  var headString = el.value.substring(0, el.selectionStart);
+  var tailString = el.value.substring(el.selectionStart, el.value.length);
+  var selection = el.value.substring(el.selectionStart, el.selectionEnd);
+  var start = el.selectionStart;
+  var end = el.selectionEnd;
+  el.value = headString + selection + tailString;
+  el.selectionStart = start + selection.length;
+  el.selectionEnd = end + selection.length;
   return el.value;
 };
 
