@@ -22,22 +22,22 @@ $(document).on('ready', function() {
       duplicate(el);
     } else if ((ctrl || cmd) && shift && up) {
       e.preventDefault();
-      shiftLinesUp(el);
+      manipulateInput(el, shiftLinesUp);
     } else if ((ctrl || cmd) && shift && down) {
       e.preventDefault();
-      shiftLinesDown(el);
+      manipulateInput(el, shiftLinesDown);
     } else if (((ctrl || cmd) && openBracket) || (shift && tab)) {
       e.preventDefault();
-      outdentSelection(el);
+      manipulateInput(el, outdentSelection);
     } else if (((ctrl || cmd) && closeBracket) || tab) {
       e.preventDefault();
-      indentSelection(el);
+      manipulateInput(el, indentSelection);
     } else if ((ctrl || cmd) && shift && enter) {
       e.preventDefault();
-      insertLineAbove(el);
+      manipulateInput(el, insertLineAbove);
     } else if ((ctrl || cmd) && enter) {
       e.preventDefault();
-      insertLineBelow(el);
+      manipulateInput(el, insertLineBelow);
     }
   };
   $('textarea').on('keydown', setState);
@@ -62,145 +62,128 @@ var countIndent = function(line) {
   return indent;
 }
 
-var insertLineAbove = function(el) {
-  var startLine = getLineNumberAtIndex(el, el.selectionStart);
+var manipulateInput = function(el, fn) {
+  var lineStart = getLineNumberAtIndex(el, el.selectionStart);
+  var lineEnd = getLineNumberAtIndex(el, el.selectionEnd);
   var lines = el.value.split(String.fromCharCode(10));
-  var indentSize = countIndent(lines[startLine - 1]);
-  lines.splice(startLine, 0, repeatChar(' ', indentSize));
+  var result = fn(el, lines, el.selectionStart, el.selectionEnd, lineStart, lineEnd);
+  el.value = result.value;
+  el.selectionStart = result.selectionStart;
+  el.selectionEnd = result.selectionEnd;
+  return el;
+}
+
+var insertLineAbove = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var indentSize = countIndent(lines[lineStart - 1]);
+  lines.splice(lineStart, 0, repeatChar(' ', indentSize));
   var start = indentSize;
-  for(var i = 0; i < startLine; i++) {
+  for(var i = 0; i < lineStart; i++) {
     start += lines[i].length + 1;
   }
-
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start;
-  el.selectionEnd = start;
-  return el.value;
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: start,
+    selectionEnd: start
+  };
 };
 
-var insertLineBelow = function(el) {
-  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
-  var lines = el.value.split(String.fromCharCode(10));
-  var indentSize = countIndent(lines[endLine]);
-  lines.splice(endLine + 1, 0, repeatChar(' ', indentSize));
+var insertLineBelow = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var indentSize = countIndent(lines[lineEnd]);
+  lines.splice(lineEnd + 1, 0, repeatChar(' ', indentSize));
   var start = indentSize;
-  for(var i = 0; i <= endLine; i++) {
+  for(var i = 0; i <= lineEnd; i++) {
     start += lines[i].length + 1;
   }
-
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start;
-  el.selectionEnd = start;
-  return el.value;
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: start,
+    selectionEnd: start
+  };
 };
 
-var indentSelection = function(el) {
-  var startLine = getLineNumberAtIndex(el, el.selectionStart);
-  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
-  var start = el.selectionStart;
-  var end = el.selectionEnd;
-  var lines = el.value.split(String.fromCharCode(10));
-
-  start += indentSize;
-  for (var i = startLine; i <= endLine; i++) {
+var indentSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  selectionStart += indentSize;
+  for (var i = lineStart; i <= lineEnd; i++) {
     lines[i] = repeatChar(' ', indentSize) + lines[i];
-    end += indentSize;
+    selectionEnd += indentSize;
   }
-
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start;
-  el.selectionEnd = end;
-  return el.value;
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart,
+    selectionEnd: selectionEnd
+  };
 };
 
-var outdentSelection = function(el) {
-  var startLine = getLineNumberAtIndex(el, el.selectionStart);
-  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
-  var start = el.selectionStart;
-  var end = el.selectionEnd;
-  var lines = el.value.split(String.fromCharCode(10));
-
-  for (var i = startLine; i <= endLine; i++) {
+var outdentSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  for (var i = lineStart; i <= lineEnd; i++) {
     var currentIndent = countIndent(lines[i]);
     var outdentSize = Math.min(currentIndent, indentSize);
     lines[i] = lines[i].substring(outdentSize, lines[i].length);
-    end -= outdentSize;
-    if(i === startLine) {
-      start -= outdentSize;
+    selectionEnd -= outdentSize;
+    if(i === lineStart) {
+      selectionStart -= outdentSize;
     }
   }
-
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start;
-  el.selectionEnd = end;
-  return el.value;
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart,
+    selectionEnd: selectionEnd
+  };
 };
 
-var shiftLinesUp = function(el) {
-  var startLine = getLineNumberAtIndex(el, el.selectionStart);
-  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
-  var start = el.selectionStart;
-  var end = el.selectionEnd;
-
-  if(startLine <= 0) {
-    return el.value;
+var shiftLinesUp = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  if(lineStart <= 0) {
+    return el;
   }
-  var lines = el.value.split(String.fromCharCode(10));
-  var removed = lines.splice(startLine - 1, 1);
-  lines.splice(endLine, 0, removed[0]);
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start - (removed[0].length + 1);
-  el.selectionEnd = end - (removed[0].length + 1);
-  return el.value;
+  var removed = lines.splice(lineStart - 1, 1);
+  lines.splice(lineEnd, 0, removed[0]);
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart - (removed[0].length + 1),
+    selectionEnd: selectionEnd - (removed[0].length + 1)
+  };
 };
 
-var shiftLinesDown = function(el) {
-  var startLine = getLineNumberAtIndex(el, el.selectionStart);
-  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
-  var start = el.selectionStart;
-  var end = el.selectionEnd;
-
-  var lines = el.value.split(String.fromCharCode(10));
-  if(endLine >= lines.length - 1) {
-    return el.value;
+var shiftLinesDown = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  if(lineEnd >= lines.length - 1) {
+    return el;
   }
-  var removed = lines.splice(endLine + 1, 1);
-  lines.splice(startLine, 0, removed[0]);
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start + (removed[0].length + 1);
-  el.selectionEnd = end + (removed[0].length + 1);
-  return el.value;
+  var removed = lines.splice(lineEnd + 1, 1);
+  lines.splice(lineStart, 0, removed[0]);
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart + (removed[0].length + 1),
+    selectionEnd: selectionEnd + (removed[0].length + 1)
+  };
 };
 
 var duplicate = function(el) {
   if(el.selectionStart === el.selectionEnd) {
-    duplicateLine(el);
+    manipulateInput(el, duplicateLine);
   } else {
-    duplicateSelection(el);
+    manipulateInput(el, duplicateSelection);
   }
 };
 
-var duplicateLine = function(el) {
-  var lines = el.value.split(String.fromCharCode(10));
-  var start = el.selectionStart;
-  var lineNumber = getLineNumberAtIndex(el, start);
+var duplicateLine = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var lineNumber = getLineNumberAtIndex(el, selectionStart);
   lines.splice(lineNumber, 0, lines[lineNumber]);
-  el.value = lines.join(String.fromCharCode(10));
-  el.selectionStart = start + lines[lineNumber].length + 1;
-  el.selectionEnd = start + lines[lineNumber].length + 1;
-  return el.value;
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart + lines[lineNumber].length + 1,
+    selectionEnd: selectionStart + lines[lineNumber].length + 1
+  };
 };
 
-var duplicateSelection = function(el) {
+var duplicateSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
   var headString = el.value.substring(0, el.selectionStart);
   var tailString = el.value.substring(el.selectionStart, el.value.length);
   var selection = el.value.substring(el.selectionStart, el.selectionEnd);
-  var start = el.selectionStart;
-  var end = el.selectionEnd;
-  el.value = headString + selection + tailString;
-  el.selectionStart = start + selection.length;
-  el.selectionEnd = end + selection.length;
-  return el.value;
+  return {
+    value: headString + selection + tailString,
+    selectionStart: selectionStart + selection.length,
+    selectionEnd: selectionEnd + selection.length
+  };
 };
 
 var getLine = function(el) {
