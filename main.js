@@ -15,6 +15,7 @@ $(document).on('ready', function() {
     var openBracket = map[219];
     var closeBracket = map[221];
     var tab = map[9];
+    var enter = map[13];
     var D = map[68];
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
@@ -31,6 +32,12 @@ $(document).on('ready', function() {
     } else if (((ctrl || cmd) && openBracket) || (shift && tab)) {
       e.preventDefault();
       outdentSelection(el);
+    } else if ((ctrl || cmd) && shift && enter) {
+      e.preventDefault();
+      insertLineAbove(el);
+    } else if ((ctrl || cmd) && enter) {
+      e.preventDefault();
+      insertLineBelow(el);
     }
   };
   $('textarea').on('keydown', setState);
@@ -50,6 +57,21 @@ var repeatChar = function(char, repetitions) {
   }
   return string;
 }
+
+var insertLineAbove = function(el) {
+  var startLine = getLineNumberAtIndex(el, el.selectionStart);
+  var lines = el.value.split(String.fromCharCode(10));
+  lines.splice(startLine, 0, '');
+  var start = 0;
+  for(var i = 0; i < startLine; i++) {
+    start += lines[i].length + 1;
+  }
+
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start;
+  el.selectionEnd = start;
+  return el.value;
+};
 
 var indentSelection = function(el) {
   var startLine = getLineNumberAtIndex(el, el.selectionStart);
