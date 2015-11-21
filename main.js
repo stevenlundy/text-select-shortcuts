@@ -1,3 +1,5 @@
+var indentSize = 2;
+
 $(document).on('ready', function() {
   var map = []
   setState = function(e) {
@@ -23,10 +25,10 @@ $(document).on('ready', function() {
     } else if ((ctrl || cmd) && shift && down) {
       e.preventDefault();
       shiftLinesDown(el);
-    } else if (((ctrl || cmd) && openBracket) || tab) {
+    } else if (((ctrl || cmd) && closeBracket) || tab) {
       e.preventDefault();
       indentSelection(el);
-    } else if (((ctrl || cmd) && closeBracket) || (shift && tab)) {
+    } else if (((ctrl || cmd) && openBracket) || (shift && tab)) {
       e.preventDefault();
       outdentSelection(el);
     }
@@ -41,8 +43,31 @@ $(document).on('ready', function() {
   });
 });
 
-var indentSelection = function(el) {
+var repeatChar = function(char, repetitions) {
+  var string = '';
+  for (var i = 0; i < repetitions; i++) {
+    string += char;
+  }
+  return string;
+}
 
+var indentSelection = function(el) {
+  var startLine = getLineNumberAtIndex(el, el.selectionStart);
+  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
+  var start = el.selectionStart;
+  var end = el.selectionEnd;
+  var lines = el.value.split(String.fromCharCode(10));
+
+  start += indentSize;
+  for (var i = startLine; i <= endLine; i++) {
+    lines[i] = repeatChar(' ', indentSize) + lines[i];
+    end += indentSize;
+  }
+
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start;
+  el.selectionEnd = end;
+  return el.value;
 };
 
 var outdentSelection = function(el) {
