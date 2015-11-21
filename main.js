@@ -56,13 +56,23 @@ var repeatChar = function(char, repetitions) {
     string += char;
   }
   return string;
+};
+
+var countIndent = function(line) {
+  line = line || '';
+  var indent = 0;
+  while (line[indent] === ' ') {
+    indent++;
+  }
+  return indent;
 }
 
 var insertLineAbove = function(el) {
   var startLine = getLineNumberAtIndex(el, el.selectionStart);
   var lines = el.value.split(String.fromCharCode(10));
-  lines.splice(startLine, 0, '');
-  var start = 0;
+  var indentSize = countIndent(lines[startLine - 1]);
+  lines.splice(startLine, 0, repeatChar(' ', indentSize));
+  var start = indentSize;
   for(var i = 0; i < startLine; i++) {
     start += lines[i].length + 1;
   }
@@ -76,8 +86,9 @@ var insertLineAbove = function(el) {
 var insertLineBelow = function(el) {
   var endLine = getLineNumberAtIndex(el, el.selectionEnd);
   var lines = el.value.split(String.fromCharCode(10));
-  lines.splice(endLine + 1, 0, '');
-  var start = 0;
+  var indentSize = countIndent(lines[endLine]);
+  lines.splice(endLine + 1, 0, repeatChar(' ', indentSize));
+  var start = indentSize;
   for(var i = 0; i <= endLine; i++) {
     start += lines[i].length + 1;
   }
