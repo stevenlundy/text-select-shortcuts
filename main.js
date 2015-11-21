@@ -43,11 +43,6 @@ $(document).on('ready', function() {
   $('textarea').on('keydown', setState);
   $('textarea').on('keyup', setState);
   $('textarea').onkeyup = $('textarea').onkeydown = setState;
-
-  $('textarea').on('select',function() {
-    console.log('line');
-    console.log(getLine(this));
-  });
 });
 
 var repeatChar = function(char, repetitions) {
@@ -148,7 +143,7 @@ var shiftLinesUp = function(el) {
   var end = el.selectionEnd;
 
   if(startLine <= 0) {
-    return;
+    return el.value;
   }
   var lines = el.value.split(String.fromCharCode(10));
   var removed = lines.splice(startLine - 1, 1);
@@ -167,7 +162,7 @@ var shiftLinesDown = function(el) {
 
   var lines = el.value.split(String.fromCharCode(10));
   if(endLine >= lines.length - 1) {
-    return;
+    return el.value;
   }
   var removed = lines.splice(endLine + 1, 1);
   lines.splice(startLine, 0, removed[0]);
@@ -224,8 +219,3 @@ var getLineNumberAtIndex = function(el, index) {
     }
   }
 };
-
-var getCurrentInput = function() {
-  // return $(':focus')[0];
-  return $('#text-area')[0];
-}
