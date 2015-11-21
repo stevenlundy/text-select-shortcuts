@@ -26,12 +26,12 @@ $(document).on('ready', function() {
     } else if ((ctrl || cmd) && shift && down) {
       e.preventDefault();
       shiftLinesDown(el);
-    } else if (((ctrl || cmd) && closeBracket) || tab) {
-      e.preventDefault();
-      indentSelection(el);
     } else if (((ctrl || cmd) && openBracket) || (shift && tab)) {
       e.preventDefault();
       outdentSelection(el);
+    } else if (((ctrl || cmd) && closeBracket) || tab) {
+      e.preventDefault();
+      indentSelection(el);
     } else if ((ctrl || cmd) && shift && enter) {
       e.preventDefault();
       insertLineAbove(el);
@@ -119,7 +119,26 @@ var indentSelection = function(el) {
 };
 
 var outdentSelection = function(el) {
+  var startLine = getLineNumberAtIndex(el, el.selectionStart);
+  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
+  var start = el.selectionStart;
+  var end = el.selectionEnd;
+  var lines = el.value.split(String.fromCharCode(10));
 
+  for (var i = startLine; i <= endLine; i++) {
+    var currentIndent = countIndent(lines[i]);
+    var outdentSize = Math.min(currentIndent, indentSize);
+    lines[i] = lines[i].substring(outdentSize, lines[i].length);
+    end -= outdentSize;
+    if(i === startLine) {
+      start -= outdentSize;
+    }
+  }
+
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start;
+  el.selectionEnd = end;
+  return el.value;
 };
 
 var shiftLinesUp = function(el) {
