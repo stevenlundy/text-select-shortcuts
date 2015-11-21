@@ -73,6 +73,21 @@ var insertLineAbove = function(el) {
   return el.value;
 };
 
+var insertLineBelow = function(el) {
+  var endLine = getLineNumberAtIndex(el, el.selectionEnd);
+  var lines = el.value.split(String.fromCharCode(10));
+  lines.splice(endLine + 1, 0, '');
+  var start = 0;
+  for(var i = 0; i <= endLine; i++) {
+    start += lines[i].length + 1;
+  }
+
+  el.value = lines.join(String.fromCharCode(10));
+  el.selectionStart = start;
+  el.selectionEnd = start;
+  return el.value;
+};
+
 var indentSelection = function(el) {
   var startLine = getLineNumberAtIndex(el, el.selectionStart);
   var endLine = getLineNumberAtIndex(el, el.selectionEnd);
