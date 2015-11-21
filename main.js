@@ -10,18 +10,25 @@ $(document).on('ready', function() {
     var shift = map[16];
     var up = map[38];
     var down = map[40];
+    var openBracket = map[219];
+    var closeBracket = map[221];
+    var tab = map[9];
     var D = map[68];
-    if((ctrl || cmd) && shift && D) {
+    if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
-    }
-    if((ctrl || cmd) && shift && up) {
+    } else if ((ctrl || cmd) && shift && up) {
       e.preventDefault();
       shiftLinesUp(el);
-    }
-    if((ctrl || cmd) && shift && down) {
+    } else if ((ctrl || cmd) && shift && down) {
       e.preventDefault();
       shiftLinesDown(el);
+    } else if (((ctrl || cmd) && openBracket) || tab) {
+      e.preventDefault();
+      indentSelection(el);
+    } else if (((ctrl || cmd) && closeBracket) || (shift && tab)) {
+      e.preventDefault();
+      outdentSelection(el);
     }
   };
   $('textarea').on('keydown', setState);
@@ -33,6 +40,14 @@ $(document).on('ready', function() {
     console.log(getLine(this));
   });
 });
+
+var indentSelection = function(el) {
+
+};
+
+var outdentSelection = function(el) {
+
+};
 
 var shiftLinesUp = function(el) {
   var startLine = getLineNumberAtIndex(el, el.selectionStart);
