@@ -20,29 +20,29 @@ $(document).on('ready', function() {
     var Y = map[89];
     var Z = map[90];
 
-    el.stateHistory = el.stateHistory || [];
-    el.stateIndex = el.stateIndex || 0;
+    // el.stateHistory = el.stateHistory || [];
+    // el.stateIndex = el.stateIndex || 0;
 
-    if (((ctrl || cmd) && shift && Z) || ((ctrl || cmd) && Y)) {
-      e.preventDefault();
-      if (el.stateHistory.length > el.stateHistory + 1) {
-        el.stateIndex++;
-        setElementState(el, el.stateHistory[el.stateIndex]);
-      }
-      return;
-    }
+    // if (((ctrl || cmd) && shift && Z) || ((ctrl || cmd) && Y)) {
+    //   e.preventDefault();
+    //   if (el.stateHistory.length > el.stateHistory + 1) {
+    //     el.stateIndex++;
+    //     setElementState(el, el.stateHistory[el.stateIndex]);
+    //   }
+    //   return;
+    // }
 
-    if ((ctrl || cmd) && Z) {
-      e.preventDefault();
-      if (el.stateIndex > 0) {
-        saveElementState(el, false);
-        el.stateIndex--;
-        setElementState(el, el.stateHistory[el.stateIndex]);
-      }
-      return;
-    }
+    // if ((ctrl || cmd) && Z) {
+    //   e.preventDefault();
+    //   if (el.stateIndex > 0) {
+    //     saveElementState(el, false);
+    //     el.stateIndex--;
+    //     setElementState(el, el.stateHistory[el.stateIndex]);
+    //   }
+    //   return;
+    // }
 
-    saveElementState(el, true);
+    // saveElementState(el, true);
 
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
@@ -100,26 +100,26 @@ var manipulateInput = function(el, fn) {
   return el;
 };
 
-var setElementState = function(el, state) {
-  el.value = state.value;
-  el.selectionStart = state.selectionStart;
-  el.selectionEnd = state.selectionEnd;
-  return el;
-};
+// var setElementState = function(el, state) {
+//   el.value = state.value;
+//   el.selectionStart = state.selectionStart;
+//   el.selectionEnd = state.selectionEnd;
+//   return el;
+// };
 
-var saveElementState = function(el, clearFuture) {
-  if (clearFuture) {
-    el.stateHistory.slice(0, el.stateIndex);
-  }
-  el.stateHistory.push({
-    value: el.value,
-    selectionStart: el.selectionStart,
-    selectionEnd: el.selectionEnd
-  });
-  if (clearFuture) {
-    el.stateIndex++;
-  }
-};
+// var saveElementState = function(el, clearFuture) {
+//   if (clearFuture) {
+//     el.stateHistory.slice(0, el.stateIndex);
+//   }
+//   el.stateHistory.push({
+//     value: el.value,
+//     selectionStart: el.selectionStart,
+//     selectionEnd: el.selectionEnd
+//   });
+//   if (clearFuture) {
+//     el.stateIndex++;
+//   }
+// };
 
 var insertLineAbove = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
   var indentSize = countIndent(lines[lineStart - 1]);
