@@ -1,4 +1,6 @@
 var indentSize = 2;
+var clipboardBuffer = document.createElement('textarea');
+$('body').append(clipboardBuffer);
 
 $(document).on('ready', function() {
   var map = []
@@ -16,33 +18,37 @@ $(document).on('ready', function() {
     var closeBracket = map[221];
     var tab = map[9];
     var enter = map[13];
+    var C = map[67];
     var D = map[68];
     var Y = map[89];
     var Z = map[90];
 
-    // el.stateHistory = el.stateHistory || [];
-    // el.stateIndex = el.stateIndex || 0;
+    el.stateHistory = el.stateHistory || [];
+    el.stateIndex = el.stateIndex || 0;
 
-    // if (((ctrl || cmd) && shift && Z) || ((ctrl || cmd) && Y)) {
-    //   e.preventDefault();
-    //   if (el.stateHistory.length > el.stateHistory + 1) {
-    //     el.stateIndex++;
-    //     setElementState(el, el.stateHistory[el.stateIndex]);
-    //   }
-    //   return;
-    // }
+    if (((ctrl || cmd) && shift && Z) || ((ctrl || cmd) && Y)) {
+      e.preventDefault();
+      if (el.stateHistory.length > el.stateIndex) {
+        setElementState(el, el.stateHistory[el.stateIndex]);
+        el.stateIndex++;
+      }
+      return;
+    }
 
-    // if ((ctrl || cmd) && Z) {
-    //   e.preventDefault();
-    //   if (el.stateIndex > 0) {
-    //     saveElementState(el, false);
-    //     el.stateIndex--;
-    //     setElementState(el, el.stateHistory[el.stateIndex]);
-    //   }
-    //   return;
-    // }
+    if ((ctrl || cmd) && Z) {
+      e.preventDefault();
+      if (el.stateIndex > 1) {
+        saveElementState(el, false);
+        el.stateIndex--;
+        setElementState(el, el.stateHistory[el.stateIndex - 1]);
+      }
+      return;
+    }
 
-    // saveElementState(el, true);
+    saveElementState(el, true);
+
+    console.log(el.stateIndex);
+    console.log(el.stateHistory);
 
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
@@ -65,10 +71,30 @@ $(document).on('ready', function() {
     } else if ((ctrl || cmd) && enter) {
       e.preventDefault();
       manipulateInput(el, insertLineBelow);
+    } else if ((ctrl || cmd) && C) {
+      clipboardBuffer.focus();
+      clipboardBuffer.value = 'hello!';
+      clipboardBuffer.selectionStart = 0;
+      clipboardBuffer.selectionEnd = 5;
+      clipboardBuffer.originElement = el;
+      console.log('%c e on ctrl+C --> ', 'font-size:16px; background-color:black; color:white;');
+      console.log(e);
+      console.log('%c this on ctrl+C --> ', 'font-size:16px; background-color:black; color:white;');
+      console.log(el);
     }
   };
   $('textarea').on('keydown', setState);
   $('textarea').on('keyup', setState);
+  $('textarea').on('copy', function(e) {
+    debugger;
+    console.log('%c e on copy --> ', 'font-size:16px; background-color:black; color:white;');
+    console.log(e);
+    e.currentTarget.originElement.focus();
+  });
+  $('textarea').on('beforecopy', function(e) {
+    console.log('%c e beforecopy --> ', 'font-size:16px; background-color:black; color:white;');
+    console.log(e);
+  });
   $('textarea').onkeyup = $('textarea').onkeydown = setState;
 });
 
@@ -100,26 +126,28 @@ var manipulateInput = function(el, fn) {
   return el;
 };
 
-// var setElementState = function(el, state) {
-//   el.value = state.value;
-//   el.selectionStart = state.selectionStart;
-//   el.selectionEnd = state.selectionEnd;
-//   return el;
-// };
+var setElementState = function(el, state) {
+  el.value = state.value;
+  el.selectionStart = state.selectionStart;
+  el.selectionEnd = state.selectionEnd;
+  return el;
+};
 
-// var saveElementState = function(el, clearFuture) {
-//   if (clearFuture) {
-//     el.stateHistory.slice(0, el.stateIndex);
-//   }
-//   el.stateHistory.push({
-//     value: el.value,
-//     selectionStart: el.selectionStart,
-//     selectionEnd: el.selectionEnd
-//   });
-//   if (clearFuture) {
-//     el.stateIndex++;
-//   }
-// };
+var saveElementState = function(el, clearFuture) {
+  if(el.stateHistory.length === 0 || el.value !== el.stateHistory[el.stateIndex - 1].value) {
+    if (clearFuture) {
+      el.stateHistory = el.stateHistory.slice(0, el.stateIndex);
+    }
+    el.stateHistory.push({
+      value: el.value,
+      selectionStart: el.selectionStart,
+      selectionEnd: el.selectionEnd
+    });
+    if (clearFuture) {
+      el.stateIndex++;
+    }
+  }
+};
 
 var insertLineAbove = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
   var indentSize = countIndent(lines[lineStart - 1]);
