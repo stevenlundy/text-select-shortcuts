@@ -26,6 +26,7 @@ ready(function() {
     var enter = map[13];
     var C = map[67];
     var D = map[68];
+    var L = map[76];
     var Y = map[89];
     var Z = map[90];
 
@@ -56,6 +57,9 @@ ready(function() {
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
+    } else if ((ctrl || cmd) && L) {
+      e.preventDefault();
+      selectLine(el);
     } else if ((ctrl || cmd) && shift && up) {
       e.preventDefault();
       manipulateInput(el, shiftLinesUp);
@@ -217,6 +221,18 @@ var shiftLinesDown = function(el, lines, selectionStart, selectionEnd, lineStart
     selectionEnd: selectionEnd + (removed[0].length + 1)
   };
 };
+
+var selectLine = function(el) {
+  if(el.selectionStart === el.selectionEnd) {
+    manipulateInput(el, expandSelectionToLine);
+  } else {
+    manipulateInput(el, addNextLineToSelection);
+  }
+};
+
+var expandSelectionToLine = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {};
+
+var addNextLineToSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {};
 
 var duplicate = function(el) {
   if(el.selectionStart === el.selectionEnd) {
