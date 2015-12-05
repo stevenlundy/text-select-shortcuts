@@ -58,6 +58,9 @@ ready(function() {
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
+    } else if ((ctrl || cmd) && D) {
+      e.preventDefault();
+      manipulateInput(el, selectWord);
     } else if ((ctrl || cmd) && shift && K) {
       e.preventDefault();
       manipulateInput(el, deleteLine);
@@ -139,6 +142,30 @@ var saveElementState = function(el, clearFuture) {
     if (clearFuture) {
       el.stateIndex++;
     }
+  }
+};
+
+var selectWord = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var currentSelection = el.value.substring(selectionStart, selectionEnd);
+  var alphaNumOnly = /^\w*$/;
+  if (alphaNumOnly.test(currentSelection)) {
+    while(selectionEnd < el.value.length && alphaNumOnly.test(el.value[selectionEnd])) {
+      selectionEnd++;
+    }
+    while(selectionStart > 0 && alphaNumOnly.test(el.value[selectionStart - 1])) {
+      selectionStart--;
+    }
+    return {
+      value: el.value,
+      selectionStart: selectionStart,
+      selectionEnd: selectionEnd
+    };
+  } else {
+    return {
+      value: el.value,
+      selectionStart: selectionStart,
+      selectionEnd: selectionEnd
+    };
   }
 };
 
