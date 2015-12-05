@@ -222,17 +222,46 @@ var shiftLinesDown = function(el, lines, selectionStart, selectionEnd, lineStart
   };
 };
 
+var selectionOnOneLine = function(el) {
+  for (var i = el.selectionStart; i < el.selectionEnd; i++) {
+    if (el.value[i] === String.fromCharCode(10)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 var selectLine = function(el) {
-  if(el.selectionStart === el.selectionEnd) {
+  if(selectionOnOneLine(el)) {
     manipulateInput(el, expandSelectionToLine);
   } else {
     manipulateInput(el, addNextLineToSelection);
   }
 };
 
-var expandSelectionToLine = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {};
+var expandSelectionToLine = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var selectionStart = 0;
+  for (var i = 0; i < lineStart; i++) {
+    selectionStart += lines[i].length + 1;
+  }
+  return {
+    value: el.value,
+    selectionStart: selectionStart,
+    selectionEnd: selectionStart + lines[lineStart].length + 1
+  };
+};
 
-var addNextLineToSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {};
+var addNextLineToSelection = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  var selectionEnd = selectionStart;
+  for (var i = lineStart; i <= lineEnd; i++) {
+    selectionEnd += lines[i].length + 1;
+  }
+  return {
+    value: el.value,
+    selectionStart: selectionStart,
+    selectionEnd: selectionEnd
+  };
+};
 
 var duplicate = function(el) {
   if(el.selectionStart === el.selectionEnd) {
