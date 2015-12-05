@@ -26,6 +26,7 @@ ready(function() {
     var enter = map[13];
     var C = map[67];
     var D = map[68];
+    var K = map[75];
     var L = map[76];
     var Y = map[89];
     var Z = map[90];
@@ -57,6 +58,9 @@ ready(function() {
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
+    } else if ((ctrl || cmd) && shift && K) {
+      e.preventDefault();
+      manipulateInput(el, deleteLine);
     } else if ((ctrl || cmd) && L) {
       e.preventDefault();
       selectLine(el);
@@ -137,6 +141,22 @@ var saveElementState = function(el, clearFuture) {
     }
   }
 };
+
+var deleteLine = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+  lines.splice(lineStart, lineEnd - lineStart + 1);
+  if (lineStart === lines.length) {
+    lines.push('');
+  }
+  selectionStart = 0;
+  for (var i = 0; i < lineStart; i++) {
+    selectionStart += lines[i].length + 1;
+  }
+  return {
+    value: lines.join(String.fromCharCode(10)),
+    selectionStart: selectionStart,
+    selectionEnd: selectionStart
+  };
+}
 
 var insertLineAbove = function(el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
   var indentSize = countIndent(lines[lineStart - 1]);
