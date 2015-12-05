@@ -1,6 +1,4 @@
 var indentSize = 2;
-var clipboardBuffer = document.createElement('textarea');
-$('body').append(clipboardBuffer);
 
 $(document).on('ready', function() {
   var map = []
@@ -47,9 +45,6 @@ $(document).on('ready', function() {
 
     saveElementState(el, true);
 
-    console.log(el.stateIndex);
-    console.log(el.stateHistory);
-
     if ((ctrl || cmd) && shift && D) {
       e.preventDefault();
       duplicate(el);
@@ -71,30 +66,10 @@ $(document).on('ready', function() {
     } else if ((ctrl || cmd) && enter) {
       e.preventDefault();
       manipulateInput(el, insertLineBelow);
-    } else if ((ctrl || cmd) && C) {
-      clipboardBuffer.focus();
-      clipboardBuffer.value = 'hello!';
-      clipboardBuffer.selectionStart = 0;
-      clipboardBuffer.selectionEnd = 5;
-      clipboardBuffer.originElement = el;
-      console.log('%c e on ctrl+C --> ', 'font-size:16px; background-color:black; color:white;');
-      console.log(e);
-      console.log('%c this on ctrl+C --> ', 'font-size:16px; background-color:black; color:white;');
-      console.log(el);
     }
   };
   $('textarea').on('keydown', setState);
   $('textarea').on('keyup', setState);
-  $('textarea').on('copy', function(e) {
-    debugger;
-    console.log('%c e on copy --> ', 'font-size:16px; background-color:black; color:white;');
-    console.log(e);
-    e.currentTarget.originElement.focus();
-  });
-  $('textarea').on('beforecopy', function(e) {
-    console.log('%c e beforecopy --> ', 'font-size:16px; background-color:black; color:white;');
-    console.log(e);
-  });
   $('textarea').onkeyup = $('textarea').onkeydown = setState;
 });
 
