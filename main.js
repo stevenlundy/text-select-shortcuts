@@ -1,7 +1,15 @@
 var indentSize = 2;
 
-$(document).on('ready', function() {
-  var map = []
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(function() {
+  var map = [];
   setState = function(e) {
     map[e.which] =  e.type === 'keydown';
     registerKeyPress(e, this);
@@ -68,9 +76,11 @@ $(document).on('ready', function() {
       manipulateInput(el, insertLineBelow);
     }
   };
-  $('textarea').on('keydown', setState);
-  $('textarea').on('keyup', setState);
-  $('textarea').onkeyup = $('textarea').onkeydown = setState;
+  var textareas = document.querySelectorAll('textarea');
+  Array.prototype.forEach.call(textareas, function(el, i){
+    el.onkeyup = el.onkeydown = setState;
+  });
+
 });
 
 var repeatChar = function(char, repetitions) {
