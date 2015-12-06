@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Textarea Extended Shortcuts",
+  "description": "Add Sublime style keyboard shortcuts to textarea fields on websites",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["main.js"]
+    }
+  ]
+}
