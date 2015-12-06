@@ -265,6 +265,9 @@
 
   (function() {
     var map = [];
+    var resetMap = function() {
+      map = [];
+    };
     setState = function(e) {
       map[e.which] =  e.type === 'keydown';
       registerKeyPress(e, this);
@@ -346,6 +349,7 @@
     var textareas = document.querySelectorAll('textarea');
     Array.prototype.forEach.call(textareas, function(el, i){
       el.onkeyup = el.onkeydown = setState;
+      el.onfocus = resetMap;
     });
   })();
 
