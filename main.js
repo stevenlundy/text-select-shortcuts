@@ -346,11 +346,13 @@
       }
     };
 
-    var textareas = document.querySelectorAll('textarea');
-    Array.prototype.forEach.call(textareas, function(el, i){
+    var addListeners = function(el) {
       el.onkeyup = el.onkeydown = setState;
       el.onfocus = resetMap;
-    });
+    }
+
+    var textareas = document.querySelectorAll('textarea');
+    Array.prototype.forEach.call(textareas, addListeners);
   })();
 
 })();
