@@ -353,6 +353,17 @@
 
     var textareas = document.querySelectorAll('textarea');
     Array.prototype.forEach.call(textareas, addListeners);
+
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        for (var i = 0; i < mutation.addedNodes.length; i++) {
+          if(mutation.addedNodes[i].type == "textarea") {
+            addListeners(mutation.addedNodes[i]);
+          }
+        }
+      });
+    });
+    observer.observe(document, { attributes: true, childList: true, characterData: true, subtree: true });
   })();
 
 })();
