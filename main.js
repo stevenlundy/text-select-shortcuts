@@ -268,7 +268,28 @@
     var resetMap = function() {
       map = [];
     };
+    var resetRange = function(min, max) {
+      for(var i = min; i <= max; i++) {
+        if(map[i]) {
+          map[i] = false;
+        }
+      }
+    }
+    var resetNumbers = function() {
+      resetRange(48, 57);
+    };
+    var resetLetters = function() {
+      resetRange(65, 90);
+    };
+    var resetArrows = function() {
+      resetRange(37, 40);
+    };
     setState = function(e) {
+      if(map[91]|| map[93] || map[224]) {
+        resetNumbers();
+        resetLetters();
+        resetArrows();
+      }
       map[e.which] =  e.type === 'keydown';
       registerKeyPress(e, this);
     };
