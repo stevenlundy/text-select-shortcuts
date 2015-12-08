@@ -274,7 +274,7 @@
           map[i] = false;
         }
       }
-    }
+    };
     var resetNumbers = function() {
       resetRange(48, 57);
     };
@@ -284,11 +284,20 @@
     var resetArrows = function() {
       resetRange(37, 40);
     };
+    var resetBrackets = function() {
+      if(map[219]) {
+        map[219] = false;
+      }
+      if(map[221]) {
+        map[221] = false;
+      }
+    };
     setState = function(e) {
       if(map[91]|| map[93] || map[224]) {
         resetNumbers();
         resetLetters();
         resetArrows();
+        resetBrackets();
       }
       map[e.which] =  e.type === 'keydown';
       registerKeyPress(e, this);
