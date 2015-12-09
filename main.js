@@ -176,6 +176,23 @@
     };
   };
 
+  var insertIntoString = function(string, insert, index) {
+    var start = string.substring(0, index);
+    var end = string.substring(index, string.length);
+    return start + insert + end;
+  };
+
+  var wrapSelection = function(prefix, suffix, el, lines, selectionStart, selectionEnd, lineStart, lineEnd) {
+    var value = el.value;
+    value = insertIntoString(value, suffix, selectionEnd);
+    value = insertIntoString(value, prefix, selectionStart);
+    return {
+      value: value,
+      selectionStart: selectionStart + 1,
+      selectionEnd: selectionEnd + 1
+    };
+  };
+
   var selectionOnOneLine = function(el) {
     for (var i = el.selectionStart; i < el.selectionEnd; i++) {
       if (el.value[i] === String.fromCharCode(10)) {
@@ -310,6 +327,12 @@
       var down = map[40];
       var openBracket = map[219];
       var closeBracket = map[221];
+      var openBrace = map[16] && map[219];
+      var closeBrace = map[16] && map[221];
+      var openParen = map[16] && map[57];
+      var closeParen = map[16] && map[48];
+      var singleQuote = map[222];
+      var doubleQuote = map[16] && map[222];
       var tab = map[9];
       var enter = map[13];
       var C = map[67];
@@ -373,6 +396,21 @@
       } else if ((ctrl || cmd) && enter) {
         e.preventDefault();
         manipulateInput(el, insertLineBelow);
+      } else if(openParen) {
+        e.preventDefault();
+        manipulateInput(el, wrapSelection.bind(null, '(', ')'));
+      } else if(openBrace) {
+        e.preventDefault();
+        manipulateInput(el, wrapSelection.bind(null, '{', '}'));
+      } else if(openBracket) {
+        e.preventDefault();
+        manipulateInput(el, wrapSelection.bind(null, '[', ']'));
+      } else if(doubleQuote) {
+        e.preventDefault();
+        manipulateInput(el, wrapSelection.bind(null, '"', '"'));
+      } else if(singleQuote) {
+        e.preventDefault();
+        manipulateInput(el, wrapSelection.bind(null, '\'', '\''));
       }
     };
 
